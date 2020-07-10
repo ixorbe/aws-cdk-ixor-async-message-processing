@@ -1,9 +1,16 @@
 {
-  "name": "aws-cdk-ixor-async-message-processing",
-  "version": "0.1.0",
-  "bin": {
-    "aws-cdk-ixor-async-message-processing": "bin/aws-cdk-ixor-async-message-processing.js"
+  "name": "@ixor/aws-cdk-ixor-async-message-processing",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ixorbe/aws-cdk-ixor-async-message-processing.git"
   },
+  "license": "MIT",
+  "main": "lib/aws-cdk-ixor-async-message-processing",
+  "author": "Rik Tytgat <rik.tytgat@ixor.be> (https://github.com/ixorbe/)",
+  "keywords": [
+    "cdk"
+  ],
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
@@ -11,17 +18,28 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.47.0",
+    "@aws-cdk/core": "1.49.1",
+    "@aws-cdk/assert": "1.49.1",
+    "@aws-cdk/aws-lambda": "1.49.1",
+    "@aws-cdk/aws-lambda-event-sources": "1.49.1",
+    "@aws-cdk/aws-sns": "1.49.1",
+    "@aws-cdk/aws-sns-subscriptions": "1.49.1",
     "@types/jest": "^25.2.1",
     "@types/node": "10.17.5",
+    "aws-cdk": "1.49.1",
     "jest": "^25.5.0",
     "ts-jest": "^25.3.1",
-    "aws-cdk": "1.47.0",
     "ts-node": "^8.1.0",
-    "typescript": "~3.7.2"
+    "typescript": "~3.7.2",
+    "source-map-support": "^0.5.16"
   },
-  "dependencies": {
-    "@aws-cdk/core": "1.47.0",
+  "peerDependencies": {
+    "@aws-cdk/core": "1.49.1",
+    "@aws-cdk/assert": "1.49.1",
+    "@aws-cdk/aws-lambda": "1.49.1",
+    "@aws-cdk/aws-lambda-event-sources": "1.49.1",
+    "@aws-cdk/aws-sns": "1.49.1",
+    "@aws-cdk/aws-sns-subscriptions": "1.49.1",
     "source-map-support": "^0.5.16"
   }
 }
