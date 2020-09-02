@@ -1,6 +1,6 @@
 import {Aws, Construct, StackProps,Duration} from "@aws-cdk/core";
 import {IFunction} from "@aws-cdk/aws-lambda";
-import {Queue} from "@aws-cdk/aws-sqs";
+import {Queue, DeadLetterQueue} from "@aws-cdk/aws-sqs";
 import {ITopic, Topic} from "@aws-cdk/aws-sns";
 import {LambdaSubscription, SqsSubscription} from "@aws-cdk/aws-sns-subscriptions";
 import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
@@ -12,25 +12,29 @@ export interface AsyncMessageProcessingProps extends StackProps {
 }
 
 interface SqsProperties {
-  createDlq?: boolean,
-  visibilityTimeout?: Duration
+  visibilityTimeout?: Duration,
+  lambdaEventSourceBatchSize?: number;
 }
 
 export class AsyncMessageProcessing extends Construct {
   public snsTopic: ITopic;
   private maxReceiveCount: number = 5;
+  private lambdaEventSourceBatchSize: number;
 
   constructor(scope: Construct, id: string, props: AsyncMessageProcessingProps) {
     super(scope, id);
 
-    let dlqProperties = undefined;
-    if (props.sqsProperties?.createDlq) {
-      const queueDLQ = new Queue(this, 'deadLetterQueue', {});
-      dlqProperties = {queue: queueDLQ, maxReceiveCount: this.maxReceiveCount};
-    }
+    this.getLambdaEventSourceBatchSize(props);
+
+    const queueDLQ = new Queue(this, 'deadLetterQueue', {});
+    const dlqProperties: DeadLetterQueue = {queue: queueDLQ, maxReceiveCount: this.maxReceiveCount}
     const queueMain = new Queue(this, 'mainQueue', {
-      deadLetterQueue: dlqProperties,
+      deadLetterQueue: {
+        queue: queueDLQ,
+        maxReceiveCount: this.maxReceiveCount
+      },
       visibilityTimeout: props.sqsProperties?.visibilityTimeout || Duration.seconds(30),
+
     });
 
     this.snsTopic = new Topic(this, 'topic', {});
@@ -42,6 +46,14 @@ export class AsyncMessageProcessing extends Construct {
       });
     }
 
-    props.sqsConsumer.addEventSource(new SqsEventSource(queueMain));
+    props.sqsConsumer.addEventSource(new SqsEventSource(queueMain, {batchSize: this.lambdaEventSourceBatchSize}));
+  }
+
+  private getLambdaEventSourceBatchSize(props: any) {
+    if (props.sqsProperties.lambdaEventSourceBatchSize) {
+      this.lambdaEventSourceBatchSize = props.sqsProperties.lambdaEventSourceBatchSize;
+    } else {
+      this.lambdaEventSourceBatchSize = 1;
+    }
   }
 }
