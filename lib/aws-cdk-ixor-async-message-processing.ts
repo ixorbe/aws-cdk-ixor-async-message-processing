@@ -7,7 +7,7 @@ import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
 
 export interface AsyncMessageProcessingProps extends StackProps {
   snsLambdaSubscribers?: Array<IFunction>,
-  sqsConsumer: IFunction,
+  sqsConsumer?: IFunction,
   sqsProperties?: SqsProperties
 }
 
@@ -35,7 +35,7 @@ export class AsyncMessageProcessing extends Construct {
 
     this.snsTopic = new Topic(this, 'topic', {});
 
-    if (props) {
+    if (props && props.sqsConsumer) {
       this.getLambdaEventSourceBatchSize(props);
 
       const queueDLQ = new Queue(this, 'deadLetterQueue', {});
