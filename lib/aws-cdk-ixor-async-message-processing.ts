@@ -47,11 +47,7 @@ export class AsyncMessageProcessing extends Construct {
         visibilityTimeout: props.sqsProperties?.visibilityTimeout || Duration.seconds(30),
       });
 
-      this.snsTopic.addSubscription(new SqsSubscription(queueMain, {
-        filterPolicy: {
-          "action": new SubscriptionFilter([{"exists": false}])
-        }
-      }));
+      this.snsTopic.addSubscription(new SqsSubscription(queueMain));
 
       if (props.snsLambdaSubscribers) {
         props.snsLambdaSubscribers.forEach(lambda => {
@@ -84,7 +80,7 @@ export class AsyncMessageProcessing extends Construct {
   }
 
   private getLambdaEventSourceBatchSize(props: any) {
-    if (props.sqsProperties.lambdaEventSourceBatchSize) {
+    if (props.sqsProperties && props.sqsProperties.lambdaEventSourceBatchSize) {
       this.lambdaEventSourceBatchSize = props.sqsProperties.lambdaEventSourceBatchSize;
     } else {
       this.lambdaEventSourceBatchSize = 1;
